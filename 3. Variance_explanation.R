@@ -102,3 +102,13 @@ for(mm in 1:100){
   cat(green(mm,"fold is done","=====================","\n"))
 }
 
+
+### plot results
+p1<-ggplot(df.plot, aes(fill=group, x=VE.mean, y=Bacteria)) + 
+  geom_bar(position="stack", stat="identity",alpha=0.8)+
+  theme_bw()+
+  geom_text(aes(label=lab),position=position_stack(vjust=.5),size=2)+
+  scale_y_dendrogram(hclust=hc,position = "right")+
+  scale_fill_nejm()+ylab("")+xlab("Variance explained (R2)")+
+  theme(legend.position = "bottom")
+
