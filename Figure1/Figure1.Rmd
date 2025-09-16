@@ -4,6 +4,7 @@ library(ggpubr)
 library(phyloseq)
 library(pheatmap)
 
+### =============================================================================================
 ### Plot Panel A
 
 ### reformat data
@@ -162,3 +163,76 @@ ggsave(p1,filename = "./assoc_taxa/Plot_beta_0812.pdf",width = 3.5,height = 5)
 ggsave(p2,filename = "./assoc_taxa/Plot_alpha_0812.pdf",width = 3.5,height = 5)
 ggsave(p3,filename = "./assoc_taxa/Plot_taxa_0812.pdf",width = 7,height = 6.5)
 ggsave(p1,filename = "./assoc_taxa/Plot_diversity_ledgend_0812.pdf",width = 6,height = 4.5)
+
+
+
+### =============================================================================================
+### Plot Panel B
+
+### plot all significant taxa
+dat.tmp<-merge(mtx.taxa[,tmp.taxa,drop=F],metadata[,c("AGE"),drop=F],by="row.names",all=F)
+dat.tmp<-na.omit(dat.tmp)
+
+df.plot<-pivot_longer(dat.tmp,cols = 2:9,names_to = "taxa",values_to = "RA")
+
+df.plot$taxa<-gsub("g__Shuttleworthia", "Shuttleworthia (G)",df.plot$taxa)
+df.plot$taxa<-gsub("f__Enterobacteriaceae", "Enterobacteriaceae (F)",df.plot$taxa)
+
+df.plot$taxa<-gsub("s__","",df.plot$taxa)
+df.plot$taxa<-gsub("g__","",df.plot$taxa)
+df.plot$taxa<-gsub("f__","",df.plot$taxa)
+df.plot$taxa<-gsub("_"," ",df.plot$taxa)
+
+p1<-ggplot(df.plot,aes(x=AGE,y=RA))+
+  geom_smooth(method = "gam")+
+  theme_bw()+xlab("Age")+ylab("Relative abundance")+
+  facet_wrap(~taxa,scales = "free",nrow = 2)
+ggsave(p1,filename = "results/subgroup_age/Smooth_plot_gam_0520.pdf",width = 12,height = 6)
+
+df.plot1<-df.plot[which(df.plot$taxa %in% c("Lactobacillus crispatus","Gardnerella vaginalis","Atopobium vaginae")),]
+p11<-ggplot(df.plot1,aes(x=AGE,y=RA,color=taxa))+
+  geom_smooth(method = "gam")+
+  theme_bw()+xlab("Age")+ylab("Relative abundance")+
+  scale_color_npg()+theme(legend.position = "bottom")+
+  guides(color = guide_legend(ncol = 1))
+
+df.plot2<-df.plot[-which(df.plot$taxa %in% c("Lactobacillus crispatus","Gardnerella vaginalis","Atopobium vaginae")),]
+p12<-ggplot(df.plot2,aes(x=AGE,y=RA,color=taxa))+
+  geom_smooth(method = "gam")+
+  theme_bw()+xlab("Age")+ylab("Relative abundance")+
+  scale_color_nejm()+theme(legend.position = "bottom")+
+  guides(color = guide_legend(ncol = 2))
+
+p1a<-ggarrange(p11,p12,nrow = 1,align = "hv")
+ggsave(p1a,file="results/subgroup_age/rebuttal/Age_top_gam.pdf",width = 4.5,height = 3.5)
+ggsave(p1a,file="results/subgroup_age/rebuttal/Age_top_gam_legend.pdf",width = 8.5,height = 3.5)
+
+
+### =============================================================================================
+### Plot Panel C
+### res.group can be found in file xxx
+
+res.group$FDR<-p.adjust(res.group$pval,method = "BH")
+res.group$logP<- -log10(res.group$pval)
+
+res.sig<-res.group[which(res.group$FDR<0.05),]
+res.sig.nornimal<-res.group[which(res.group$pval<0.05),]
+
+p1<-ggplot(res.group,aes(x=Comparison,y=logP,group=Taxa,color=Taxa))+
+  geom_point()+
+  theme_bw()+
+  geom_line()+
+  theme(axis.text.x = element_text(angle = 45,hjust = 1))+
+  theme(legend.position = "none")+
+  #geom_hline(yintercept = -log10(0.05))+
+  xlab(" ")+ylab("-log10(P)")
+
+df.count<-as.data.frame(table(res.sig$Comparison))
+
+p2<-ggplot(df.count,aes(x=Var1,y=Freq,fill=Var1))+
+  geom_bar(stat = "identity",alpha=0.8)+
+  theme_bw()+xlab("")+ylab("N of FDR < 0.05")+
+  theme(legend.position = "none",
+        axis.text.x = element_text(angle = 45,hjust = 1))
+
+
