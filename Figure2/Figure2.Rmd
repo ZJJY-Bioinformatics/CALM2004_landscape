@@ -1,0 +1,114 @@
+### load libraries
+library(tidyverse)
+library(foreach)
+library(crayon)
+library(ggsci)
+library(ggpubr)
+library(ggVennDiagram)
+
+
+### =====================================================================
+### Plot Panel B
+### balance_df is provided as "Balance_value.txt"
+
+df.tmp<-balance_df[which(balance_df$G_healthy=="General health"),]
+df.tmp$group<-"General health"
+df.tmp<-df.tmp[,c("NEW_ID","balance_value","group")]
+mean.healthy<-mean(df.tmp$balance_value)
+df.tmp$N<-dim(df.tmp)[1]
+
+sym<-c("EXA_CERDIS","EXA_VAGWAL","EXA_ORDOR","EXA_CERBLE")
+lab<-c("BV","AV_CAT","TCT_CAT")
+STI<-c("HPV","HSV","UUU","MH","MG","NG","CT","Fungus","LAB_TV")
+col.test<-c(sym,lab,STI)
+
+for(i in col.test){
+  tmp<-balance_df[,c("NEW_ID","balance_value",i)]
+  colnames(tmp)[3]<-"group"
+  tmp<-subset(tmp,group==1)
+  tmp$group<-i
+  tmp$N<-dim(tmp)[1]
+  df.tmp<-rbind(df.tmp,tmp)
+}
+
+df.tmp$order=0
+df.tmp$order[which(df.tmp$group %in% STI)]<-1
+df.tmp$order[which(df.tmp$group %in% sym)]<-2
+df.tmp$order[which(df.tmp$group %in% lab)]<-3
+
+df.tmp$group<-gsub("\\_CAT","",df.tmp$group)
+df.tmp$group<-gsub("\\LAB_","",df.tmp$group)
+
+df.tmp$group[which(df.tmp$group=="EXA_CERDIS")]<-"Purulent cervical discharge"
+df.tmp$group[which(df.tmp$group=="EXA_VAGWAL")]<-"Red and swollen vagina"
+df.tmp$group[which(df.tmp$group=="EXA_ORDOR")]<-"Odor"
+df.tmp$group[which(df.tmp$group=="EXA_CERBLE")]<-"Cervical bleeding and swelling"
+
+df.tmp$group[which(df.tmp$group=="UUU")]<-"UU"
+df.tmp$group<-paste0(df.tmp$group," (",df.tmp$N,")")
+df.tmp<-df.tmp[order(df.tmp$order,decreasing = F),]
+df.tmp$group<-factor(df.tmp$group,levels =unique(df.tmp$group))
+df.tmp$order<-as.factor(df.tmp$order)
+
+p2<-ggplot(df.tmp,aes(x=group,y=balance_value))+
+  geom_hline(yintercept = mean.healthy, linetype="dashed", color="gray", lwd=1) +
+  geom_violin(aes(x=group, y=balance_value, fill=order), alpha=0.6, trim = F) +
+  geom_boxplot(aes(x=group, y=balance_value), width=0.1, outlier.shape = NA) +
+  scale_fill_nejm()+
+  stat_compare_means(ref.group = levels(df.tmp$group)[1],label = "p.signif",label.y = 23)+
+  theme_bw()+ xlab(" ")+ylab("Balance score")+
+  theme(panel.grid = element_blank(),
+        legend.position = "none",
+        axis.text.x = element_text(angle = 90,hjust = 1))
+ggsave(p2,filename = "results/balance_score/Boxplot_score_phenotype_all.pdf",width = 8,height = 5.5)
+
+
+
+### =====================================================================
+### Plot Panel C
+### data (rep_score) are provided in Balance_value_replication.txt
+### all figures are generated use similar ggplot code, thus here we only provide one example
+df13<-rep_score(BioProject = "PRJNA1046567")
+
+p13<-ggplot(na.omit(df13[,c("group","balance_value","BioProject","disease")]),aes(x=group,y=balance_value))+
+  geom_violin(aes(x=group, y=balance_value, fill=group), alpha=0.6, trim = F) +
+  geom_boxplot(aes(x=group, y=balance_value), width=0.1, outlier.shape = NA) +
+  scale_fill_lancet()+
+  theme_bw()+xlab(" ")+ylab("Balance score")+
+  ggtitle(paste0(unique(df13$BioProject)," (",df13$disease,")"))+
+  theme(legend.position = "none")+
+  stat_compare_means(label = "p.signif",label.x =1.5)
+
+p.all<-grid.arrange(grobs=list(p1,p2,p3,p41,p42,p5,p6,p7,p8,p9,p10,p11,p12,p13),nrow=2)
+ggsave(p.all,filename = "results/balance_score/boxplot_replication.pdf",width = 16,height = 5)
+
+
+### =====================================================================
+### Plot Panel D-E
+### data are provided in "Balance_score_cox.txt"
+
+df.plot1$sig<-"NS"
+df.plot1$sig[which(df.plot1$pval<0.05 & df.plot1$FDR>0.05)]<-"Nominal"
+df.plot1$sig[which(df.plot1$FDR<0.05 & df.plot1$HR>1)]<-"Positive"
+df.plot1$sig[which(df.plot1$FDR<0.05 & df.plot1$HR<1)]<-"Negative"
+
+p11 <- ggplot(data=df.plot1, aes(x=reorder(out,-HR), y=HR, ymin=CI_low, ymax=CI_high,color=sig)) +
+  geom_pointrange(position=position_dodge(width = 0.6)) + 
+  geom_errorbar(aes(ymin=CI_low, ymax=CI_high,col=sig),width=0.3,cex=0.5,position=position_dodge(width = 0.3))+ 
+  geom_hline(yintercept=1, lty=2) +  # add a dotted line at x=1 after flip
+  coord_flip() +  # flip coordinates (puts labels on y axis)
+  xlab("") + ylab("HR (95% CI)") +
+  #facet_grid(~exposure,scales = "free_x")+
+  scale_color_manual(values = c("gray","#D95050","#F4C573","#889CCF"))+labs(color="Exposure")+
+  theme_classic()+
+  theme(legend.position = "none",axis.text.y = element_text(size = 12))
+
+# plot survival area
+p1<-plot_surv_area(time="TIME",
+               status="F_G_healthy",
+               variable="balance_value",
+               data=tmp,start_color = "#BB5566",end_color="#44AA99",label_digits = 3,
+               model=cox.hpv,discrete=TRUE,bins = 3,
+               title = "General health")
+
+
