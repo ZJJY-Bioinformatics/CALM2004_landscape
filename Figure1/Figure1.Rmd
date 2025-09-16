@@ -1,0 +1,164 @@
+### load libraries
+library(tidyverse)
+library(ggpubr)
+library(phyloseq)
+library(pheatmap)
+
+### Plot Panel A
+
+### reformat data
+# a. results of adonis
+res.beta$group<-df.group$group[match(res.beta$test,df.group$Var)]
+res.beta$group<-factor(res.beta$group,c("Demo","Lifestyle","Reproductive","Drug_disease","Symptom"))
+
+res.beta$sig<-NA
+res.beta$sig[which(res.beta$FDR<0.05)]<-"FDR<0.05"
+res.beta$sig[which(res.beta$FDR>=0.05 & res.beta$FDR<0.1)]<-"FDR<0.1"
+res.beta$sig[which(res.beta$FDR>=0.1)]<-"NS"
+res.beta$sig<-factor(res.beta$sig,levels = c("NS","FDR<0.1","FDR<0.05"))
+
+bb<-arrange(res.beta, desc(R2), group_by = group)
+var.order<-c(bb$test[which(bb$group==levels(res.beta$group)[1])],
+             bb$test[which(bb$group==levels(res.beta$group)[2])],
+             bb$test[which(bb$group==levels(res.beta$group)[3])],
+             bb$test[which(bb$group==levels(res.beta$group)[4])],
+             bb$test[which(bb$group==levels(res.beta$group)[5])])
+
+# b. results of alpha diversity
+res.alpha1$group<-df.group$group[match(res.alpha1$col,df.group$Var)]
+res.alpha1$group<-factor(res.alpha1$group,c("Demo","Lifestyle","Reproductive","Drug_disease","Symptom"))
+
+res.alpha1$sig<-NA
+res.alpha1$sig[which(res.alpha1$FDR<0.05)]<-"FDR<0.05"
+res.alpha1$sig[which(res.alpha1$FDR>=0.05 & res.alpha1$FDR<0.1)]<-"FDR<0.1"
+res.alpha1$sig[which(res.alpha1$FDR>0.1)]<-"NS"
+res.alpha1$sig<-factor(res.alpha1$sig,levels = c("NS","FDR<0.1","FDR<0.05"))
+res.alpha1$col<-factor(res.alpha1$col,levels = rev(var.order))
+
+# c. results of taxa associations
+res.taxa$Bacteria<-gsub("g__Shuttleworthia", "Shuttleworthia (G)",res.taxa$Bacteria)
+res.taxa$Bacteria<-gsub("f__Enterobacteriaceae", "Enterobacteriaceae (F)",res.taxa$Bacteria)
+
+res.taxa$Bacteria<-gsub("s__","",res.taxa$Bacteria)
+res.taxa$Bacteria<-gsub("g__","",res.taxa$Bacteria)
+res.taxa$Bacteria<-gsub("f__","",res.taxa$Bacteria)
+res.taxa$Bacteria<-gsub("_"," ",res.taxa$Bacteria)
+
+res.taxa$group<-df.group$group[match(res.taxa$Var,df.group$Var)]
+res.taxa$group<-factor(res.taxa$group,c("Demo","Lifestyle","Reproductive","Drug_disease","Symptom"))
+res.taxa$Var<-factor(res.taxa$Var,levels = rev(var.order))
+
+res.plot<-res.taxa
+res.plot$estimate[which(res.plot$Pval>0.05)]<-0
+
+res.plot$sig<-cut(res.plot$FDR,breaks = c(-Inf,0.05,0.1,Inf),labels = c("**","*"," "))
+
+## order taxa by clustering
+aa<-pivot_wider(res.plot[,c("Bacteria","Var","estimate")],names_from = "Var",values_from = "estimate")
+aa<-as.data.frame(aa)
+rownames(aa)<-aa$Bacteria
+aa<-aa[,-1]
+
+pheat<-pheatmap(aa,cluster_cols = F)
+taxa_order<-rownames(aa)[pheat$tree_row$order]
+
+### extract significant results
+res.sel1<-res.beta$test[which(res.beta$FDR<0.05)]
+res.sel2<-res.alpha1$col[which(res.alpha1$FDR<0.05)]
+res.sel<-unique(c(res.sel1,as.character(res.sel2),"SEX_PARTNER_CAT"))
+
+res.beta1<-res.beta[which(res.beta$test %in% res.sel),]
+p1<-ggplot(res.beta1,aes(x=R2,y=reorder(test,R2),fill=sig))+
+  geom_bar(stat = "identity")+
+  facet_grid(group~.,scales = "free_y",space = "free")+
+  scale_fill_manual(values=c("gray","#D93907"))+
+  theme_classic()+ylab("")+xlim(0,0.0053)+
+  theme(legend.position = "top")
+
+bb<-arrange(res.beta1, desc(R2), group_by = group)
+var.order<-c(bb$test[which(bb$group==levels(res.beta1$group)[1])],
+             bb$test[which(bb$group==levels(res.beta1$group)[2])],
+             bb$test[which(bb$group==levels(res.beta1$group)[3])],
+             bb$test[which(bb$group==levels(res.beta1$group)[4])],
+             bb$test[which(bb$group==levels(res.beta1$group)[5])])
+
+res.alpha11<-res.alpha1[which(res.alpha1$col %in% res.sel),]
+p2<-ggplot(res.alpha11,aes(x=BETA,y=col,color=sig))+
+  geom_point(mapping = aes(x=BETA),size=3,shape=15)+
+  facet_grid(group~.,scales = "free_y",space = "free")+
+  geom_errorbar(aes(x=BETA,xmin=CI.low, xmax=CI.high),width=0)+
+  scale_color_manual(values=c("gray","#D93907"))+
+  theme_classic()+ylab("")+
+  geom_vline(xintercept = 0, linetype="dotted",size=1)+
+  theme(legend.position = "top")
+
+
+### plot taxa
+res.taxa<-read.csv2("assoc_taxa/Res_model3_0520.csv")
+res.taxa$Bacteria<-gsub("g__Shuttleworthia", "Shuttleworthia (G)",res.taxa$Bacteria)
+res.taxa$Bacteria<-gsub("f__Enterobacteriaceae", "Enterobacteriaceae (F)",res.taxa$Bacteria)
+
+res.taxa$Bacteria<-gsub("s__","",res.taxa$Bacteria)
+res.taxa$Bacteria<-gsub("g__","",res.taxa$Bacteria)
+res.taxa$Bacteria<-gsub("f__","",res.taxa$Bacteria)
+res.taxa$Bacteria<-gsub("_"," ",res.taxa$Bacteria)
+
+res.taxa$group<-df.group$group[match(res.taxa$Var,df.group$Var)]
+res.taxa$group<-factor(res.taxa$group,c("Demo","Lifestyle","Reproductive","Drug_disease","Symptom"))
+
+res.taxa1<-res.taxa[which(res.taxa$Var %in% res.sel),]
+res.taxa1$Var<-factor(res.taxa1$Var,levels = rev(var.order))
+
+res.plot<-res.taxa1
+res.plot$estimate[which(res.plot$Pval>0.05)]<-0
+
+res.plot$sig<-cut(res.plot$FDR,breaks = c(-Inf,0.05,0.1,Inf),labels = c("**","*"," "))
+
+## order taxa by clustering
+aa<-pivot_wider(res.plot[,c("Bacteria","Var","estimate")],names_from = "Var",values_from = "estimate")
+aa<-as.data.frame(aa)
+rownames(aa)<-aa$Bacteria
+aa<-aa[,-1]
+
+pheat<-pheatmap(aa,cluster_cols = F)
+taxa_order<-rownames(aa)[pheat$tree_row$order]
+
+p3<-ggplot(res.plot,aes(x=Bacteria,y=Var,fill=estimate))+
+  geom_tile(colour="gray")+
+  scale_fill_gradient2(low="#0052A5", high = "#d11141", mid = "white", midpoint = 0)+
+  #scale_fill_manual(values=c("#000099","#0033CC","#0000FF","#6666FF","#9999FF","white","#FFF3B2","#FEB24C","#FC4E2A","#E31A1C","#990000"))+
+  geom_text(aes(label=sig), size=4,color="black") +
+  theme_classic()+
+  scale_x_discrete(limits = taxa_order)+
+  labs(fill="Beta")+
+  facet_grid(group~.,scales = "free_y",space = "free")+
+  #coord_fixed(ratio = 1)+
+  theme(#axis.text.y = element_text(hjust = 0),
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    #panel.border = element_rect(colour = "black", fill=NA, size=0.8),
+    legend.position = "top")+ylab("")+xlab("")
+
+### plot label
+res.beta1$label_y<-c("Ethnic minority","Education (High school)","Education (Primary school)",
+                    "Income (Low)","Smoking","Alcohol",
+                    "Sex partner (>1)","Birth control (IUD)","Birth control (condom)",
+                    "Gravidity (1 time)","Gravidity (>1 time)","Parity (1 time)","Parity (>1 time)",
+                    "Itching","Dyspareunia","Irregular bleeding",
+                    "Cervical ectropion","Vaginal odor","Cervical bleeding and swelling","Age",
+                    "Follicular phase","Luteal phase"
+)
+
+p_left<-ggplot(res.beta1,aes(x=R2,y=reorder(test,R2)))+
+  geom_text(aes(x=1,label=label_y),hjust=1)+
+  theme_void() +
+  coord_cartesian(xlim = c(0, 1.5))+
+  facet_grid(group~.,space = "free",scales = "free")+
+  theme(strip.background = element_blank(),strip.text = element_blank())
+
+
+
+ggsave(p_left,filename = "./assoc_taxa/Plot_y_label_0812.pdf",width = 4,height = 5)
+ggsave(p1,filename = "./assoc_taxa/Plot_beta_0812.pdf",width = 3.5,height = 5)
+ggsave(p2,filename = "./assoc_taxa/Plot_alpha_0812.pdf",width = 3.5,height = 5)
+ggsave(p3,filename = "./assoc_taxa/Plot_taxa_0812.pdf",width = 7,height = 6.5)
+ggsave(p1,filename = "./assoc_taxa/Plot_diversity_ledgend_0812.pdf",width = 6,height = 4.5)
