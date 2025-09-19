@@ -1,0 +1,49 @@
+Defination	Features	BETA	SE	p value	CI.low	CI.high	N	FDR
+continous	AGE	5,44E-03	1,08E-03	4,78E-07	3,32E-03	7,55E-03	5437	1,00E-05
+birth control, 0 = no birth control, 1= condom	BIRTH_CONTROL3	-1,18E-01	2,31E-02	3,46E-07	-1,63E-01	-7,26E-02	3679	1,00E-05
+0 = collage or above, 1 = High school	EDU_CAT2	1,84E-01	4,24E-02	1,50E-05	1,01E-01	2,67E-01	2506	2,10E-04
+0 = collage or above, 1 = Primary school or lower	EDU_CAT1	7,36E-02	1,73E-02	2,04E-05	3,98E-02	1,07E-01	4412	2,14E-04
+vaginal odor, 0=no, 1=yes	EXA_ORDOR	1,28E-01	3,17E-02	5,87E-05	6,54E-02	1,90E-01	4810	4,93E-04
+pain or bleeding during sexual behavior (Dyspareunia), 0=no, 1=yes	SYM_PAINBLE	1,03E-01	2,63E-02	9,91E-05	5,10E-02	1,54E-01	5305	6,93E-04
+vaginal itching (Itching), 0=no, 1=yes	SYM_ITCHING	5,86E-02	1,77E-02	9,68E-04	2,38E-02	9,33E-02	5347	5,81E-03
+irregular vaginal bleeding (Irregular bleeding) , 0=no, 1=yes 	SYM_BLEDDING	8,14E-02	2,86E-02	4,38E-03	2,54E-02	1,37E-01	5298	2,30E-02
+0 = Han, 1 = Ethinic minority	ETHINIC	9,86E-02	3,74E-02	8,40E-03	2,53E-02	1,72E-01	5133	3,92E-02
+cervical bleeding and swelling , 0=no, 1=yes	EXA_CERBLE	6,28E-02	3,10E-02	4,32E-02	1,93E-03	1,24E-01	4782	1,81E-01
+cervical ectropion , 0=no, 1=yes	EXA_CERECT	4,77E-02	2,48E-02	5,42E-02	-8,67E-04	9,64E-02	3625	2,07E-01
+Number of sex paterners, 0 = 1 paterner, 1= more than 1 parteners	SEX_PARTNER_CAT	7,27E-02	4,29E-02	9,04E-02	-1,15E-02	1,57E-01	5165	3,16E-01
+continous	BMI	3,87E-03	2,54E-03	1,27E-01	-1,10E-03	8,85E-03	5437	3,80E-01
+pain urinating or lumbago (Urodynia), 0=no, 1=yes	SYM_URIOSP	-3,31E-02	2,13E-02	1,21E-01	-7,48E-02	8,69E-03	5300	3,80E-01
+times of parity, 0 = 0 time, 1= 1 time	PARITY1	3,52E-02	2,57E-02	1,71E-01	-1,52E-02	8,57E-02	3122	4,47E-01
+0=non-smoking, 1=smoking	SMOKING_CAT	5,28E-02	3,95E-02	1,81E-01	-2,46E-02	1,30E-01	5246	4,47E-01
+urgency to urinate or frequently urinate (Frequency/ urgency of urination), 0=no, 1=yes	SYM_YYD	3,80E-02	2,80E-02	1,75E-01	-1,69E-02	9,28E-02	5198	4,47E-01
+redness and swelling of the vaginal wall (Red and swollen vagina), 0=no, 1=yes	EXA_VAGWAL	4,42E-02	3,84E-02	2,49E-01	-3,10E-02	1,19E-01	4793	5,51E-01
+Menstrual phase, 1= luteal, 0= other phase	MENSTRUAL_PHASE_REG3	-2,09E-02	1,78E-02	2,40E-01	-5,58E-02	1,40E-02	3657	5,51E-01
+0 = high income level, 1 = middle income level	INCOME1	-2,52E-02	2,42E-02	2,98E-01	-7,27E-02	2,23E-02	2471	5,78E-01
+Menstrual phase, 1 = follicular, 0=other phase	MENSTRUAL_PHASE_REG1	1,91E-02	1,79E-02	2,87E-01	-1,60E-02	5,42E-02	3657	5,78E-01
+hyperthention history, 0=no, 1=yes	PS_HYPERTENSION	5,13E-02	4,98E-02	3,03E-01	-4,63E-02	1,49E-01	5296	5,78E-01
+times of adverse pregnancy, 0=1 time, 1= more than 1 time	ADVERSE_PREGNANCY2	-2,84E-02	2,98E-02	3,40E-01	-8,68E-02	2,99E-02	3519	5,95E-01
+birth control, 0 = no birth control, 1= pills	BIRTH_CONTROL2	-6,04E-02	6,23E-02	3,33E-01	-1,83E-01	6,19E-02	889	5,95E-01
+sexual behaviour in past 72h, 0=no, 1=yes	SEX72	4,67E-02	5,40E-02	3,88E-01	-5,93E-02	1,53E-01	4976	6,51E-01
+regular menstrual cycle, 0=yes, 1=no	MENSTRUAL_REGULAR	-2,26E-02	2,74E-02	4,09E-01	-7,63E-02	3,11E-02	4899	6,60E-01
+times of parity, 0 = 0 time, 1= more than 1 time	PARITY2	2,20E-02	2,88E-02	4,46E-01	-3,45E-02	7,85E-02	2832	6,93E-01
+estrogen in past months, 0=no, 1=yes	DRUG_ESTROGEN	-5,55E-02	7,87E-02	4,80E-01	-2,10E-01	9,87E-02	4825	7,20E-01
+times of gravidity, 0= 0 time, 1= more than 1 time	GRAVITY2	1,79E-02	2,88E-02	5,35E-01	-3,85E-02	7,42E-02	3991	7,74E-01
+alcohol drinking habit, 0=no, 1=yes	ALCOHOL_CAT	-1,01E-02	1,74E-02	5,61E-01	-4,43E-02	2,40E-02	5279	7,85E-01
+times of adverse pregnancy, 0=1 time, 1= 1 time	ADVERSE_PREGNANCY1	-9,62E-03	2,47E-02	6,97E-01	-5,80E-02	3,88E-02	3704	9,04E-01
+purulent cervical discharge, 0=no, 1=yes	EXA_CERDIS	1,27E-02	3,07E-02	6,80E-01	-4,75E-02	7,28E-02	4864	9,04E-01
+times of gravidity, 0= 0 time, 1= 1 time	GRAVITY1	-8,94E-03	2,84E-02	7,53E-01	-6,47E-02	4,68E-02	1854	9,04E-01
+diabetes history, 0=no, 1=yes	PS_DIABETES	1,85E-02	5,65E-02	7,43E-01	-9,23E-02	1,29E-01	5297	9,04E-01
+continous	WAISTLINE	-6,02E-04	1,72E-03	7,26E-01	-3,97E-03	2,76E-03	1975	9,04E-01
+Menstrual phase, 1 = ovulation, 0=other phase	MENSTRUAL_PHASE_REG2	1,16E-02	4,19E-02	7,82E-01	-7,06E-02	9,38E-02	3657	9,13E-01
+birth control, 0 = no birth control, 1= IUD	BIRTH_CONTROL1	7,20E-03	3,62E-02	8,43E-01	-6,39E-02	7,83E-02	1275	9,15E-01
+antibiotics in past months, 0=no, 1=yes	DRUG_ANTIBIOTICS	9,63E-03	5,68E-02	8,65E-01	-1,02E-01	1,21E-01	4828	9,15E-01
+0 = high income level, 1 = low income level	INCOME2	6,06E-03	2,64E-02	8,19E-01	-4,57E-02	5,79E-02	2656	9,15E-01
+lower abdominal pain (Abnormal pain), 0=no, 1=yes	SYM_ABDPAIN	-3,53E-03	2,19E-02	8,72E-01	-4,65E-02	3,94E-02	5321	9,15E-01
+glulip in past month, 0=no, 1=yes	DRUG_GLULIP	1,38E-03	7,76E-02	9,86E-01	-1,51E-01	1,53E-01	4827	9,86E-01
+UTI history, 0=no, 1=yes	PS_UTI	-9,70E-04	2,62E-02	9,70E-01	-5,23E-02	5,04E-02	5217	9,86E-01
+								
+"beta, se, the regression coefficient and standard error of linear regression model
+CI.low, CI.high, 95% confidence interval of regression coefficient
+N, sample size of the analysis
+Defination: defination of the feature in the analysis
+highlight: associations with FDR < 0.1"								
