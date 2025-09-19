@@ -6,6 +6,9 @@ library(pheatmap)
 
 ### =============================================================================================
 ### Plot Panel A
+### res.beta can be found in result_adonis.txt
+### res.alpha can be found in result_alpha.txt
+### res.taxa can be found in result_taxa.txt
 
 ### reformat data
 # a. results of adonis
@@ -210,7 +213,7 @@ ggsave(p1a,file="results/subgroup_age/rebuttal/Age_top_gam_legend.pdf",width = 8
 
 ### =============================================================================================
 ### Plot Panel C
-### res.group can be found in file xxx
+### res.group can be found in "Shannon.txt"
 
 res.group$FDR<-p.adjust(res.group$pval,method = "BH")
 res.group$logP<- -log10(res.group$pval)
